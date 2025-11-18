@@ -12,8 +12,7 @@ FROM eclipse-temurin:17-jdk-alpine
 # Directorio de trabajo
 WORKDIR /app
 
-# Copiar el JAR generado (cambiá "app.jar" por el nombre real)
-COPY target/*.jar app.jar
+COPY target/*.jar lavadero-1.0.0.jar
 
 # Exponer el puerto requerido por Render
 EXPOSE 8080
