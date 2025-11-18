@@ -21,4 +21,4 @@ EXPOSE 8080
 ENV PORT=8080
 
 # Comando de inicio
-ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=$PORT"]
+ENTRYPOINT ["sh", "-c", "java -jar lavadero-1.0.0.jar --server.port=$PORT"]
