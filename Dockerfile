@@ -12,7 +12,7 @@ FROM eclipse-temurin:17-jdk-alpine
 # Directorio de trabajo
 WORKDIR /app
 
-COPY target/*.jar lavadero-1.0.0.jar
+COPY --from=build /app/target/*.jar lavadero-1.0.0.jar
 
 # Exponer el puerto requerido por Render
 EXPOSE 8080
