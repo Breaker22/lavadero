@@ -1,5 +1,6 @@
 package ar.com.estela.lavadero.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
@@ -19,7 +20,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LaundySale {
+public class LaundySale implements Serializable {
+
+	private static final long serialVersionUID = 520847609958104335L;
 
 	@Id
 	@GeneratedValue
