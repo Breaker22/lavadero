@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class GenerateReceiptData {
 	
+	private Long code;
+	
 	private Integer quantity;
 	
 	private String description;

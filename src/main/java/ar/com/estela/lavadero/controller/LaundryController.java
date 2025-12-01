@@ -18,7 +18,9 @@ import ar.com.estela.lavadero.dto.LaundryDto;
 import ar.com.estela.lavadero.dto.LaundrySaleDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
 import ar.com.estela.lavadero.interfaces.LaundryInterface;
+import ar.com.estela.lavadero.interfaces.UserInfoSaleInterface;
 import ar.com.estela.lavadero.response.LaundrySaleResponse;
+import ar.com.estela.lavadero.response.UserSaleResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -30,9 +32,12 @@ public class LaundryController {
 	private final GenerateReceiptInterface generateReceiptInterface;
 
 	private final LaundryInterface laundryInterface;
+	
+	private final UserInfoSaleInterface userInfoSaleInterface;
 
 	@PostMapping("/print")
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
+		userInfoSaleInterface.saveUserSale(receiptDto);
 		return generateReceiptInterface.printReceipt(receiptDto);
 	}
 
@@ -62,6 +67,11 @@ public class LaundryController {
 	public ResponseEntity<String> deleteSale(@RequestParam Long id) {
 		laundryInterface.deleteSale(id);
 		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/search-sale")
+	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone) {
+		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone));
 	}
 
 }

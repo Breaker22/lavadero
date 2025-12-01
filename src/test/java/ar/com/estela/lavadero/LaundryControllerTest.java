@@ -57,7 +57,7 @@ class LaundryControllerTest {
 	void testPrintLaundry() {
 		GenerateReceiptDto generateReceipt = new GenerateReceiptDto();
 
-		generateReceipt.setData(Arrays.asList(new GenerateReceiptData(2, "test", 100)));
+		generateReceipt.setData(Arrays.asList(new GenerateReceiptData(0l, 2, "test", 100)));
 		generateReceipt.setName("test");
 		generateReceipt.setPhone("122333");
 
