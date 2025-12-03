@@ -16,7 +16,9 @@ public class UserSaleResponse {
 	
 	private String phone;
 	
-	private String name;	
+	private String name;
+	
+	private String date;
 	
 	private List<LaundryDto> listLaundry;
 

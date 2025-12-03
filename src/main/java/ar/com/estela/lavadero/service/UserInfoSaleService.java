@@ -1,5 +1,6 @@
 package ar.com.estela.lavadero.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,8 +23,9 @@ public class UserInfoSaleService implements UserInfoSaleInterface {
 	private final LaundryRepository laundryRepo;
 
 	@Override
-	public UserSaleResponse getUserSalesByPhone(String phone) {
-		UserInfoSale userSale = userInfoRepo.findById(phone).orElse(null);
+	public UserSaleResponse getUserSalesByPhone(String phone, String date) {
+		UserInfoSale userSale = userInfoRepo
+				.findById(new StringBuilder(phone).append("*").append(LocalDate.parse(date)).toString()).orElse(null);
 
 		if (userSale == null) {
 			return new UserSaleResponse();
@@ -32,14 +34,18 @@ public class UserInfoSaleService implements UserInfoSaleInterface {
 		List<LaundryDto> listLaundry = laundryRepo.findAllById(userSale.getListLaundry()).stream()
 				.map(l -> new LaundryDto(l.getId(), l.getDescription(), l.getPrice())).toList();
 
-		return UserSaleResponse.builder().phone(phone).name(userSale.getName()).listLaundry(listLaundry).build();
+		return UserSaleResponse.builder().phone(phone).name(userSale.getName()).date(userSale.getDate().toString())
+				.listLaundry(listLaundry).build();
 	}
 
 	@Override
 	public void saveUserSale(GenerateReceiptDto receiptDto) {
 		List<Long> listCodes = receiptDto.getData().stream().map(GenerateReceiptData::getCode).toList();
+		LocalDate today = LocalDate.now();
 
-		userInfoRepo.save(new UserInfoSale(receiptDto.getPhone(), receiptDto.getName(), listCodes));
+		userInfoRepo.save(new UserInfoSale(
+				new StringBuilder(receiptDto.getPhone()).append("*").append(today.toString()).toString(),
+				receiptDto.getPhone(), today, receiptDto.getName(), listCodes));
 	}
 
 }

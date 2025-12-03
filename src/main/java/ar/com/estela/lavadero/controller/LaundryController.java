@@ -70,8 +70,8 @@ public class LaundryController {
 	}
 	
 	@GetMapping("/search-sale")
-	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone) {
-		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone));
+	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone, @RequestParam String date) {
+		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone, date));
 	}
 
 }

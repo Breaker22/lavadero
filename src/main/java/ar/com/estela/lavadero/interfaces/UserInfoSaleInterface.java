@@ -5,7 +5,7 @@ import ar.com.estela.lavadero.response.UserSaleResponse;
 
 public interface UserInfoSaleInterface {
 	
-	UserSaleResponse getUserSalesByPhone(String phone);
+	UserSaleResponse getUserSalesByPhone(String phone, String date);
 	
 	void saveUserSale(GenerateReceiptDto receiptDto);
 

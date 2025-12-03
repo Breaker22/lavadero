@@ -1,6 +1,7 @@
 package ar.com.estela.lavadero.entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -22,7 +23,11 @@ public class UserInfoSale implements Serializable {
 	private static final long serialVersionUID = 5235350295815858278L;
 
 	@Id
+	private String phoneDate;
+	
 	private String phone;
+	
+	private LocalDate date;
 	
 	private String name;	
 	
