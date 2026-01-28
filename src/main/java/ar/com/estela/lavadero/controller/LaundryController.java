@@ -24,7 +24,7 @@ import ar.com.estela.lavadero.response.UserSaleResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping(value = "/laundry", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/laundry")
 @CrossOrigin(origins = "http://localhost:5173")
 @AllArgsConstructor
 public class LaundryController {
@@ -32,33 +32,33 @@ public class LaundryController {
 	private final GenerateReceiptInterface generateReceiptInterface;
 
 	private final LaundryInterface laundryInterface;
-	
+
 	private final UserInfoSaleInterface userInfoSaleInterface;
 
-	@PostMapping("/print")
+	@PostMapping(value = "/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
 		userInfoSaleInterface.saveUserSale(receiptDto);
 		return generateReceiptInterface.printReceipt(receiptDto);
 	}
 
-	@PostMapping
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createLaundry(@RequestBody LaundryDto laundryDto) {
 		laundryInterface.createLaundry(laundryDto);
 		return ResponseEntity.ok().body("ok");
 	}
 
-	@GetMapping
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LaundryDto>> getAllLaundry() {
 		return ResponseEntity.ok().body(laundryInterface.getAllLaundry());
 	}
 
-	@PostMapping("/sale")
+	@PostMapping(value = "/sale", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> saveSale(@RequestBody List<LaundrySaleDto> laundrySaleDto) {
 		laundryInterface.saveSale(laundrySaleDto);
 		return ResponseEntity.ok().body("ok");
 	}
 
-	@GetMapping("/sale")
+	@GetMapping(value = "/sale", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LaundrySaleResponse> getAllSales(@RequestParam String dateFrom, @RequestParam String dateTo) {
 		return ResponseEntity.ok().body(laundryInterface.getAllSales(dateFrom, dateTo));
 	}
@@ -68,8 +68,8 @@ public class LaundryController {
 		laundryInterface.deleteSale(id);
 		return ResponseEntity.ok().build();
 	}
-	
-	@GetMapping("/search-sale")
+
+	@GetMapping(value = "/search-sale", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone, @RequestParam String date) {
 		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone, date));
 	}
