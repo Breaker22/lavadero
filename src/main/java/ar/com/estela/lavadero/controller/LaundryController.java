@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping(value = "/laundry", consumes = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @AllArgsConstructor
 public class LaundryController {
 
