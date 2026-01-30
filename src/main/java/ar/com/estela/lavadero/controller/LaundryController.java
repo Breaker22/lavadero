@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.dto.LaundryDto;
 import ar.com.estela.lavadero.dto.LaundrySaleDto;
+import ar.com.estela.lavadero.dto.UserInfoDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
 import ar.com.estela.lavadero.interfaces.LaundryInterface;
+import ar.com.estela.lavadero.interfaces.UserInfoInterface;
 import ar.com.estela.lavadero.interfaces.UserInfoSaleInterface;
 import ar.com.estela.lavadero.response.LaundrySaleResponse;
 import ar.com.estela.lavadero.response.UserSaleResponse;
@@ -34,6 +36,8 @@ public class LaundryController {
 	private final LaundryInterface laundryInterface;
 
 	private final UserInfoSaleInterface userInfoSaleInterface;
+	
+	private final UserInfoInterface userInfoInterface;
 
 	@PostMapping(value = "/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
@@ -73,5 +77,15 @@ public class LaundryController {
 	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone, @RequestParam String date) {
 		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone, date));
 	}
-
+	
+	@PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> createUser(@RequestBody UserInfoDto userInfoDto) {
+		userInfoInterface.createUser(userInfoDto);
+		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserInfoDto> getUser(@RequestParam String phone) {
+		return ResponseEntity.ok().body(userInfoInterface.getUserByPhone(phone));
+	}
 }

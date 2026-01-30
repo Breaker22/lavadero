@@ -14,5 +14,7 @@ public class GenerateReceiptDto {
 	private String phone;
 	
 	private String payment;
+	
+	private String address;
 
 }
