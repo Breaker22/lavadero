@@ -29,7 +29,9 @@ public class UserInfoSale implements Serializable {
 	
 	private LocalDate date;
 	
-	private String name;	
+	private String name;
+	
+	private String address;
 	
 	private List<Long> listLaundry;
 

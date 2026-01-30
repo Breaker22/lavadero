@@ -85,8 +85,10 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 
 			document.add(Chunk.NEWLINE);
 			document.add(lineSeparator);
+			
+			StringBuilder userAdress = new StringBuilder("Direccion: ").append(receiptDto.getAddress()).append("\n");
 
-			StringBuilder nameAndPhone = new StringBuilder("Nombre: ").append(receiptDto.getName())
+			StringBuilder nameAndPhone = new StringBuilder(userAdress).append("Nombre: ").append(receiptDto.getName())
 					.append("\n Telefono: ").append(receiptDto.getPhone());
 
 			nameAndPhone.append("\n Tipo de pago: ").append(receiptDto.getPayment());

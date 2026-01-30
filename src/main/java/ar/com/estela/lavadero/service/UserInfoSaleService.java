@@ -45,7 +45,7 @@ public class UserInfoSaleService implements UserInfoSaleInterface {
 
 		userInfoRepo.save(new UserInfoSale(
 				new StringBuilder(receiptDto.getPhone()).append("*").append(today.toString()).toString(),
-				receiptDto.getPhone(), today, receiptDto.getName(), listCodes));
+				receiptDto.getPhone(), today, receiptDto.getName(), receiptDto.getAddress() , listCodes));
 	}
 
 }
