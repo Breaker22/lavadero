@@ -1,6 +1,7 @@
 package ar.com.estela.lavadero.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,9 +62,10 @@ public class LaundryService implements LaundryInterface {
 			Laundry laundry = laundryRepo.findById(auxSale.getLaundryId()).orElseThrow(() -> new RuntimeException());
 
 			Integer total = laundry.getPrice() * auxSale.getQuantity();
+			ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
 
 			laundrySale.setLaundry(laundry);
-			laundrySale.setDate(LocalDate.now());
+			laundrySale.setDate(LocalDate.now(argentinaZone));
 
 			switch (auxSale.getPaymentCode()) {
 			case 1:

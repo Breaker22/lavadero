@@ -1,6 +1,7 @@
 package ar.com.estela.lavadero.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -41,7 +42,8 @@ public class UserInfoSaleService implements UserInfoSaleInterface {
 	@Override
 	public void saveUserSale(GenerateReceiptDto receiptDto) {
 		List<Long> listCodes = receiptDto.getData().stream().map(GenerateReceiptData::getCode).toList();
-		LocalDate today = LocalDate.now();
+		ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
+		LocalDate today = LocalDate.now(argentinaZone);
 
 		userInfoRepo.save(new UserInfoSale(
 				new StringBuilder(receiptDto.getPhone()).append("*").append(today.toString()).toString(),
