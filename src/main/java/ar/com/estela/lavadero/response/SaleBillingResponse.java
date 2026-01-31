@@ -1,8 +1,5 @@
 package ar.com.estela.lavadero.response;
 
-import java.util.List;
-
-import ar.com.estela.lavadero.dto.LaundryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,14 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserSaleResponse {
-	
-	private String phone;
-	
-	private String name;
+public class SaleBillingResponse {
 	
 	private String date;
 	
-	private List<LaundryDto> listLaundry;
+	private Integer orders;
+	
+	private Integer items;
 
 }

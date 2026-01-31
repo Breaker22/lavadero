@@ -20,9 +20,9 @@ import ar.com.estela.lavadero.dto.UserInfoDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
 import ar.com.estela.lavadero.interfaces.LaundryInterface;
 import ar.com.estela.lavadero.interfaces.UserInfoInterface;
-import ar.com.estela.lavadero.interfaces.UserInfoSaleInterface;
+import ar.com.estela.lavadero.interfaces.SaleBillingInterface;
 import ar.com.estela.lavadero.response.LaundrySaleResponse;
-import ar.com.estela.lavadero.response.UserSaleResponse;
+import ar.com.estela.lavadero.response.SaleBillingResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -35,13 +35,13 @@ public class LaundryController {
 
 	private final LaundryInterface laundryInterface;
 
-	private final UserInfoSaleInterface userInfoSaleInterface;
+	private final SaleBillingInterface saleBillingInterface;
 	
 	private final UserInfoInterface userInfoInterface;
 
 	@PostMapping(value = "/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
-		userInfoSaleInterface.saveUserSale(receiptDto);
+		saleBillingInterface.saveSaleBilling(receiptDto);
 		return generateReceiptInterface.printReceipt(receiptDto);
 	}
 
@@ -74,8 +74,8 @@ public class LaundryController {
 	}
 
 	@GetMapping(value = "/search-sale", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserSaleResponse> getUserSalesByPhone(@RequestParam String phone, @RequestParam String date) {
-		return ResponseEntity.ok().body(userInfoSaleInterface.getUserSalesByPhone(phone, date));
+	public ResponseEntity<SaleBillingResponse> getSalesByDate(@RequestParam String date) {
+		return ResponseEntity.ok().body(saleBillingInterface.getSalesByDate(date));
 	}
 	
 	@PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
