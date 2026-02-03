@@ -1,6 +1,7 @@
 package ar.com.estela.lavadero.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.com.estela.lavadero.dto.BillingReceiptDto;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.dto.LaundryDto;
 import ar.com.estela.lavadero.dto.LaundrySaleDto;
 import ar.com.estela.lavadero.dto.UserInfoDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
 import ar.com.estela.lavadero.interfaces.LaundryInterface;
-import ar.com.estela.lavadero.interfaces.UserInfoInterface;
 import ar.com.estela.lavadero.interfaces.SaleBillingInterface;
+import ar.com.estela.lavadero.interfaces.UserInfoInterface;
 import ar.com.estela.lavadero.response.LaundrySaleResponse;
 import ar.com.estela.lavadero.response.SaleBillingResponse;
 import lombok.AllArgsConstructor;
@@ -41,8 +43,9 @@ public class LaundryController {
 
 	@PostMapping(value = "/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
-		saleBillingInterface.saveSaleBilling(receiptDto);
-		return generateReceiptInterface.printReceipt(receiptDto);
+		Long randomNum = UUID.randomUUID().getLeastSignificantBits() & Long.MAX_VALUE;
+		saleBillingInterface.saveSaleBilling(randomNum, receiptDto);
+		return generateReceiptInterface.printReceipt(randomNum, receiptDto);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -87,5 +90,10 @@ public class LaundryController {
 	@GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDto> getUser(@RequestParam String phone) {
 		return ResponseEntity.ok().body(userInfoInterface.getUserByPhone(phone));
+	}
+	
+	@PostMapping(value = "/sale/print", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<byte[]> printSaleBilling(@RequestBody BillingReceiptDto receiptDto) {
+		return generateReceiptInterface.printBilling(receiptDto);
 	}
 }

@@ -17,6 +17,7 @@ import com.lowagie.text.Document;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
@@ -25,6 +26,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.draw.LineSeparator;
 
+import ar.com.estela.lavadero.dto.BillingReceiptDto;
 import ar.com.estela.lavadero.dto.GenerateReceiptData;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
@@ -36,12 +38,12 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 
 	@Value("${paper-width}")
 	private Integer paperWidth;
-	
+
 	@Value("${paper-heigth}")
 	private Integer paperHeight;
 
 	@Override
-	public ResponseEntity<byte[]> printReceipt(GenerateReceiptDto receiptDto) {
+	public ResponseEntity<byte[]> printReceipt(Long randomNum, GenerateReceiptDto receiptDto) {
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			// conversión mm -> puntos ( (valor / 25.4) * 72 )
 			float width = (Float.valueOf(paperWidth) / Float.valueOf("25.4")) * Float.valueOf(72);
@@ -57,7 +59,11 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			document.open();
 
 			Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 10);
-			Paragraph receiptDesc = new Paragraph("Recibo no valido \n como factura", fontTitle);
+
+			StringBuilder titleString = new StringBuilder(" ").append(randomNum)
+					.append("\n Recibo no valido como factura");
+
+			Paragraph receiptDesc = new Paragraph(titleString.toString(), fontTitle);
 			receiptDesc.setAlignment(Element.ALIGN_CENTER);
 			document.add(receiptDesc);
 
@@ -77,7 +83,7 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			address.setAlignment(Element.ALIGN_CENTER);
 			document.add(address);
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:MM:ss");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 			Paragraph todayDate = new Paragraph("Fecha: ".concat(LocalDateTime.now().format(formatter)), fontTitle);
 			todayDate.setAlignment(Element.ALIGN_CENTER);
@@ -85,7 +91,7 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 
 			document.add(Chunk.NEWLINE);
 			document.add(lineSeparator);
-			
+
 			StringBuilder userAdress = new StringBuilder("Direccion: ").append(receiptDto.getAddress()).append("\n");
 
 			StringBuilder nameAndPhone = new StringBuilder(userAdress).append("Nombre: ").append(receiptDto.getName())
@@ -165,6 +171,68 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			return null;
 		}
 
+	}
+
+	@Override
+	public ResponseEntity<byte[]> printBilling(BillingReceiptDto request) {
+		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+			Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+			PdfWriter.getInstance(document, outputStream);
+
+			document.setMargins(10, 10, 10, 10);
+
+			document.open();
+
+			Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 10);
+			Paragraph receiptDesc = new Paragraph("Cierre de caja", fontTitle);
+			receiptDesc.setAlignment(Element.ALIGN_CENTER);
+			document.add(receiptDesc);
+
+			Paragraph title = new Paragraph("Tintoreria Lavadero Europressing", fontTitle);
+			title.setAlignment(Element.ALIGN_CENTER);
+			document.add(title);
+
+			document.add(Chunk.NEWLINE);
+
+			LineSeparator lineSeparator = new LineSeparator();
+			lineSeparator.setLineWidth(0.3f);
+			lineSeparator.setPercentage(50);
+			lineSeparator.setAlignment(Element.ALIGN_CENTER);
+			document.add(lineSeparator);
+
+			Paragraph address = new Paragraph("Avenida Independencia 3636", fontTitle);
+			address.setAlignment(Element.ALIGN_CENTER);
+			document.add(address);
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+			Paragraph todayDate = new Paragraph("Fecha: ".concat(LocalDateTime.now().format(formatter)), fontTitle);
+			todayDate.setAlignment(Element.ALIGN_CENTER);
+			document.add(todayDate);
+
+			document.add(Chunk.NEWLINE);
+			document.add(lineSeparator);
+
+			StringBuilder firstPart = new StringBuilder("Ordenes: ").append(request.getOrders()).append("\n Prendas: ")
+					.append(request.getItems());
+
+			Paragraph userData = new Paragraph(firstPart.toString(), fontTitle);
+			userData.setAlignment(Element.ALIGN_LEFT);
+			document.add(userData);
+			document.add(new Paragraph("\n", fontTitle));
+
+			document.close();
+
+			HttpHeaders headersResponse = new HttpHeaders();
+			headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=facturacion.pdf");
+			headersResponse.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+
+			return ResponseEntity.ok().headers(headersResponse).body(outputStream.toByteArray());
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+			return null;
+		}
 	}
 
 }
