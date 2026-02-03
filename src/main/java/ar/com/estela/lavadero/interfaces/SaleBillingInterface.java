@@ -1,6 +1,7 @@
 package ar.com.estela.lavadero.interfaces;
 
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
+import ar.com.estela.lavadero.dto.SalePaymentDto;
 import ar.com.estela.lavadero.response.SaleBillingResponse;
 
 public interface SaleBillingInterface {
@@ -8,5 +9,9 @@ public interface SaleBillingInterface {
 	SaleBillingResponse getSalesByDate(String date);
 	
 	void saveSaleBilling(Long randomNum, GenerateReceiptDto receiptDto);
+	
+	void saveSalePayment(SalePaymentDto salePaymentDto);
+	
+	SalePaymentDto getSalePayment(Long code);
 
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ar.com.estela.lavadero.dto.GenerateReceiptData;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
+import ar.com.estela.lavadero.dto.SalePaymentDto;
 import ar.com.estela.lavadero.entity.SaleBilling;
 import ar.com.estela.lavadero.entity.SalePayment;
 import ar.com.estela.lavadero.interfaces.SaleBillingInterface;
@@ -58,8 +59,33 @@ public class SaleBillingService implements SaleBillingInterface {
 
 		saleBillingRepo.save(new SaleBilling(today, Integer.sum(saleBilling.getOrders(), 1),
 				Integer.sum(saleBilling.getItems(), items)));
-		
+
 		salePaymentRepo.save(salePayment);
+	}
+
+	@Override
+	public void saveSalePayment(SalePaymentDto salePaymentDto) {
+		SalePayment salePayment = salePaymentRepo.findById(salePaymentDto.getCode()).orElse(null);
+
+		if (salePayment != null) {
+			Integer totalDiscount = salePayment.getReserve() + salePaymentDto.getReserve();
+
+			if (totalDiscount <= salePayment.getAmount()) {
+				salePayment.setReserve(totalDiscount);
+				salePaymentRepo.save(salePayment);
+			}
+		}
+	}
+
+	@Override
+	public SalePaymentDto getSalePayment(Long code) {
+		SalePayment salePayment = salePaymentRepo.findById(code).orElse(null);
+		
+		if (salePayment == null) {
+			return new SalePaymentDto();
+		}
+
+		return new SalePaymentDto(salePayment.getCode(), salePayment.getAmount(), salePayment.getReserve());
 	}
 
 }

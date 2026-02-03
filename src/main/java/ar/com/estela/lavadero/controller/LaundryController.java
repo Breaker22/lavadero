@@ -18,6 +18,7 @@ import ar.com.estela.lavadero.dto.BillingReceiptDto;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.dto.LaundryDto;
 import ar.com.estela.lavadero.dto.LaundrySaleDto;
+import ar.com.estela.lavadero.dto.SalePaymentDto;
 import ar.com.estela.lavadero.dto.UserInfoDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
 import ar.com.estela.lavadero.interfaces.LaundryInterface;
@@ -95,5 +96,16 @@ public class LaundryController {
 	@PostMapping(value = "/sale/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printSaleBilling(@RequestBody BillingReceiptDto receiptDto) {
 		return generateReceiptInterface.printBilling(receiptDto);
+	}
+	
+	@PostMapping(value= "/sale/payment", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> saveSalePayment(@RequestBody SalePaymentDto salePaymentDto) {
+		saleBillingInterface.saveSalePayment(salePaymentDto);
+		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping(value= "/sale/payment", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<SalePaymentDto> getSalePayment(@RequestParam Long code) {
+		return ResponseEntity.ok().body(saleBillingInterface.getSalePayment(code));
 	}
 }

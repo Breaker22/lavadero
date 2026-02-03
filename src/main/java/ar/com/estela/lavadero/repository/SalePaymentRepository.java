@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import ar.com.estela.lavadero.entity.SalePayment;
 
 @Repository
-public interface SalePaymentRepository extends JpaRepository<SalePayment, Integer> {
+public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> {
 
 }
