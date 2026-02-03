@@ -3,6 +3,7 @@ package ar.com.estela.lavadero.service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -46,6 +47,9 @@ public class LaundryService implements LaundryInterface {
 	@Override
 	public List<LaundryDto> getAllLaundry() {
 		List<Laundry> listLaundry = laundryRepo.findAll();
+
+		listLaundry.sort(Comparator.comparing(Laundry::getId));
+		
 		ArrayList<LaundryDto> response = new ArrayList<>();
 
 		for (Laundry laundry : listLaundry) {
