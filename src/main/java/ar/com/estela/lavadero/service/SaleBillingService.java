@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import ar.com.estela.lavadero.dto.GenerateReceiptData;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.entity.SaleBilling;
+import ar.com.estela.lavadero.entity.SalePayment;
 import ar.com.estela.lavadero.interfaces.SaleBillingInterface;
 import ar.com.estela.lavadero.repository.SaleBillingRepository;
+import ar.com.estela.lavadero.repository.SalePaymentRepository;
 import ar.com.estela.lavadero.response.SaleBillingResponse;
 import lombok.AllArgsConstructor;
 
@@ -18,6 +20,7 @@ import lombok.AllArgsConstructor;
 public class SaleBillingService implements SaleBillingInterface {
 
 	private final SaleBillingRepository saleBillingRepo;
+	private final SalePaymentRepository salePaymentRepo;
 
 	@Override
 	public SaleBillingResponse getSalesByDate(String date) {
@@ -32,11 +35,12 @@ public class SaleBillingService implements SaleBillingInterface {
 	}
 
 	@Override
-	public void saveSaleBilling(GenerateReceiptDto receiptDto) {
+	public void saveSaleBilling(Long randomNum, GenerateReceiptDto receiptDto) {
 		ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
 		LocalDate today = LocalDate.now(argentinaZone);
 
 		SaleBilling saleBilling = saleBillingRepo.findById(today).orElse(null);
+		SalePayment salePayment = new SalePayment();
 
 		if (saleBilling == null) {
 			saleBilling = new SaleBilling();
@@ -45,10 +49,17 @@ public class SaleBillingService implements SaleBillingInterface {
 			saleBilling.setOrders(0);
 		}
 
+		salePayment.setCode(randomNum);
+		salePayment.setPayment(receiptDto.getPayment());
+		salePayment.setAmount(receiptDto.getData().stream().mapToInt(GenerateReceiptData::getPrice).sum());
+		salePayment.setReserve(receiptDto.getReserve());
+
 		Integer items = receiptDto.getData().stream().mapToInt(GenerateReceiptData::getQuantity).sum();
 
 		saleBillingRepo.save(new SaleBilling(today, Integer.sum(saleBilling.getOrders(), 1),
 				Integer.sum(saleBilling.getItems(), items)));
+		
+		salePaymentRepo.save(salePayment);
 	}
 
 }

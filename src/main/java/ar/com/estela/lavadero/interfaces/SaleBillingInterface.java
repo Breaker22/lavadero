@@ -7,6 +7,6 @@ public interface SaleBillingInterface {
 	
 	SaleBillingResponse getSalesByDate(String date);
 	
-	void saveSaleBilling(GenerateReceiptDto receiptDto);
+	void saveSaleBilling(Long randomNum, GenerateReceiptDto receiptDto);
 
 }

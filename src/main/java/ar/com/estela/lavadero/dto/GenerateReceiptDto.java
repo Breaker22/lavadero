@@ -16,5 +16,7 @@ public class GenerateReceiptDto {
 	private String payment;
 	
 	private String address;
+	
+	private Integer reserve;
 
 }
