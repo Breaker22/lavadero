@@ -32,7 +32,7 @@ class LaundryControllerTest {
 
 	@Mock
 	private LaundryRepository laundryRepo;
-	
+
 	@BeforeEach
 	void setUp() {
 		ReflectionTestUtils.setField(generateReceiptService, "paperWidth", 76);
@@ -61,7 +61,7 @@ class LaundryControllerTest {
 		generateReceipt.setName("test");
 		generateReceipt.setPhone("122333");
 
-		ResponseEntity<byte[]> response = generateReceiptService.printReceipt(generateReceipt);
+		ResponseEntity<byte[]> response = generateReceiptService.printReceipt(Long.valueOf(1), generateReceipt);
 
 		Assertions.assertNotNull(response.getBody());
 	}
