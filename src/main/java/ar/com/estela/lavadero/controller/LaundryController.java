@@ -62,9 +62,8 @@ public class LaundryController {
 	}
 
 	@PostMapping(value = "/sale", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> saveSale(@RequestBody List<LaundrySaleDto> laundrySaleDto) {
-		laundryInterface.saveSale(laundrySaleDto);
-		return ResponseEntity.ok().body("ok");
+	public ResponseEntity<Long> saveSale(@RequestBody LaundrySaleDto laundrySaleDto) {
+		return ResponseEntity.ok().body(laundryInterface.saveSale(laundrySaleDto));
 	}
 
 	@GetMapping(value = "/sale", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -49,7 +49,7 @@ public class LaundryService implements LaundryInterface {
 		List<Laundry> listLaundry = laundryRepo.findAll();
 
 		listLaundry.sort(Comparator.comparing(Laundry::getId));
-		
+
 		ArrayList<LaundryDto> response = new ArrayList<>();
 
 		for (Laundry laundry : listLaundry) {
@@ -60,39 +60,39 @@ public class LaundryService implements LaundryInterface {
 	}
 
 	@Override
-	public void saveSale(List<LaundrySaleDto> laundrySaleDto) {
-		for (LaundrySaleDto auxSale : laundrySaleDto) {
-			LaundySale laundrySale = new LaundySale();
-			Laundry laundry = laundryRepo.findById(auxSale.getLaundryId()).orElseThrow(() -> new RuntimeException());
+	public Long saveSale(LaundrySaleDto laundrySaleDto) {
+		LaundySale laundrySale = new LaundySale();
+		Laundry laundry = laundryRepo.findById(laundrySaleDto.getLaundryId()).orElseThrow(() -> new RuntimeException());
 
-			Integer total = laundry.getPrice() * auxSale.getQuantity();
-			ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
+		Integer total = laundry.getPrice() * laundrySaleDto.getQuantity();
+		ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
 
-			laundrySale.setLaundry(laundry);
-			laundrySale.setDate(LocalDate.now(argentinaZone));
+		laundrySale.setLaundry(laundry);
+		laundrySale.setDate(LocalDate.now(argentinaZone));
 
-			switch (auxSale.getPaymentCode()) {
-			case 1:
-				laundrySale.setTotalCash(total);
-				laundrySale.setTotalReserved(0);
-				laundrySale.setTotalPending(0);
-				break;
-			case 2:
-				laundrySale.setTotalReserved(total);
-				laundrySale.setTotalCash(0);
-				laundrySale.setTotalPending(0);
-				break;
-			case 3:
-				laundrySale.setTotalPending(total);
-				laundrySale.setTotalCash(0);
-				laundrySale.setTotalReserved(0);
-				break;
-			default:
-				break;
-			}
-
-			laundrySaleRepo.save(laundrySale);
+		switch (laundrySaleDto.getPaymentCode()) {
+		case 1:
+			laundrySale.setTotalCash(total);
+			laundrySale.setTotalReserved(0);
+			laundrySale.setTotalPending(0);
+			break;
+		case 2:
+			laundrySale.setTotalReserved(total);
+			laundrySale.setTotalCash(0);
+			laundrySale.setTotalPending(0);
+			break;
+		case 3:
+			laundrySale.setTotalPending(total);
+			laundrySale.setTotalCash(0);
+			laundrySale.setTotalReserved(0);
+			break;
+		default:
+			break;
 		}
+
+		LaundySale saleSaved = laundrySaleRepo.save(laundrySale);
+		
+		return saleSaved.getId();
 	}
 
 	@Override

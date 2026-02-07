@@ -12,7 +12,7 @@ public interface LaundryInterface {
 	
 	public List<LaundryDto> getAllLaundry();
 	
-	public void saveSale(List<LaundrySaleDto> laundrySaleDto);
+	public Long saveSale(LaundrySaleDto laundrySaleDto);
 	
 	public LaundrySaleResponse getAllSales(String dateFrom, String dateTo);
 	
