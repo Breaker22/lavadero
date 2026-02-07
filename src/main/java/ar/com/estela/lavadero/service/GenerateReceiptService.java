@@ -221,6 +221,14 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			userData.setAlignment(Element.ALIGN_LEFT);
 			document.add(userData);
 			document.add(new Paragraph("\n", fontTitle));
+			
+			StringBuilder totalDataStr = new StringBuilder("Total Cobrado: ").append(request.getTotal()).append(" Gastos: -")
+					.append(request.getSpent()).append(" Faltante: ").append(request.getMissing());
+
+			userData = new Paragraph(totalDataStr.toString(), fontTitle);
+			userData.setAlignment(Element.ALIGN_LEFT);
+			document.add(userData);
+			document.add(new Paragraph("\n", fontTitle));
 
 			document.close();
 

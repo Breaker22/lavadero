@@ -1,7 +1,7 @@
 package ar.com.estela.lavadero.controller;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +44,8 @@ public class LaundryController {
 
 	@PostMapping(value = "/print", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<byte[]> printReceipt(@RequestBody GenerateReceiptDto receiptDto) {
-		Long randomNum = UUID.randomUUID().getLeastSignificantBits() & Long.MAX_VALUE;
+		Integer range = 2000000 - 1 + 1;
+		Long randomNum = new Random().nextLong(range) + 1;
 		saleBillingInterface.saveSaleBilling(randomNum, receiptDto);
 		return generateReceiptInterface.printReceipt(randomNum, receiptDto);
 	}
