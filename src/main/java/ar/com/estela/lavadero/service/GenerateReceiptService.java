@@ -2,10 +2,13 @@ package ar.com.estela.lavadero.service;
 
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,6 +33,9 @@ import ar.com.estela.lavadero.dto.BillingReceiptDto;
 import ar.com.estela.lavadero.dto.GenerateReceiptData;
 import ar.com.estela.lavadero.dto.GenerateReceiptDto;
 import ar.com.estela.lavadero.interfaces.GenerateReceiptInterface;
+import ar.com.estela.lavadero.interfaces.LaundryInterface;
+import ar.com.estela.lavadero.response.LaundrySaleData;
+import ar.com.estela.lavadero.response.LaundrySaleResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -41,6 +47,9 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 
 	@Value("${paper-heigth}")
 	private Integer paperHeight;
+
+	@Autowired
+	private LaundryInterface laundryInterface;
 
 	@Override
 	public ResponseEntity<byte[]> printReceipt(Long randomNum, GenerateReceiptDto receiptDto) {
@@ -54,7 +63,7 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			Document document = new Document(pageSize);
 			PdfWriter.getInstance(document, outputStream);
 
-			document.setMargins(10, 10, 10, 10);
+			document.setMargins(20, 20, 20, 20);
 
 			document.open();
 
@@ -71,26 +80,21 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			title.setAlignment(Element.ALIGN_CENTER);
 			document.add(title);
 
-			document.add(Chunk.NEWLINE);
-
-			LineSeparator lineSeparator = new LineSeparator();
-			lineSeparator.setLineWidth(0.3f);
-			lineSeparator.setPercentage(50);
-			lineSeparator.setAlignment(Element.ALIGN_CENTER);
-			document.add(lineSeparator);
+			document.add(separatorLine());
 
 			Paragraph address = new Paragraph("Avenida \n Independencia 3636", fontTitle);
 			address.setAlignment(Element.ALIGN_CENTER);
 			document.add(address);
+			ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-			Paragraph todayDate = new Paragraph("Fecha: ".concat(LocalDateTime.now().format(formatter)), fontTitle);
+			Paragraph todayDate = new Paragraph("Fecha: ".concat(LocalDateTime.now(argentinaZone).format(formatter)),
+					fontTitle);
 			todayDate.setAlignment(Element.ALIGN_CENTER);
 			document.add(todayDate);
 
-			document.add(Chunk.NEWLINE);
-			document.add(lineSeparator);
+			document.add(separatorLine());
 
 			StringBuilder userAdress = new StringBuilder("Direccion: ").append(receiptDto.getAddress()).append("\n");
 
@@ -156,7 +160,7 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			document.add(titleTotal);
 
 			document.add(new Paragraph("\n", fontTitle));
-			document.add(lineSeparator);
+			document.add(separatorLine());
 
 			document.close();
 
@@ -184,7 +188,7 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 
 			document.open();
 
-			Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 10);
+			Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20);
 			Paragraph receiptDesc = new Paragraph("Cierre de caja", fontTitle);
 			receiptDesc.setAlignment(Element.ALIGN_CENTER);
 			document.add(receiptDesc);
@@ -220,15 +224,69 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 			Paragraph userData = new Paragraph(firstPart.toString(), fontTitle);
 			userData.setAlignment(Element.ALIGN_LEFT);
 			document.add(userData);
-			document.add(new Paragraph("\n", fontTitle));
-			
-			StringBuilder totalDataStr = new StringBuilder("Total Cobrado: ").append(request.getTotal()).append(" Gastos: -")
-					.append(request.getSpent()).append(" Faltante: ").append(request.getMissing());
 
-			userData = new Paragraph(totalDataStr.toString(), fontTitle);
-			userData.setAlignment(Element.ALIGN_LEFT);
-			document.add(userData);
-			document.add(new Paragraph("\n", fontTitle));
+			document.add(Chunk.NEWLINE);
+
+			NumberFormat numFormat = NumberFormat.getNumberInstance(new Locale("es", "AR"));
+
+			ZoneId argentinaZone = ZoneId.of("America/Argentina/Buenos_Aires");
+
+			LaundrySaleResponse responseSale = laundryInterface.getAllSales(LocalDate.now(argentinaZone).toString(),
+					LocalDate.now(argentinaZone).toString());
+
+			Font fontData = FontFactory.getFont(FontFactory.HELVETICA, 20);
+
+			PdfPTable table = new PdfPTable(3);
+			table.setWidthPercentage(100);
+			table.setWidths(new float[] { 5f, 5f, 5f });
+
+			PdfPCell cell = new PdfPCell(new Phrase("Efectivo", fontData));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidth(1f);
+			table.addCell(cell);
+
+			cell = new PdfPCell(new Phrase("Pendiente", fontData));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidth(1f);
+			table.addCell(cell);
+
+			cell = new PdfPCell(new Phrase("Señado", fontData));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidth(1f);
+			table.addCell(cell);
+
+			for (LaundrySaleData dataSales : responseSale.getListSales()) {
+				PdfPCell cellPrice = new PdfPCell(
+						new Phrase("$ ".concat(numFormat.format(dataSales.getTotalCash())), fontData));
+				cellPrice.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cellPrice.setBorderWidth(1f);
+				table.addCell(cellPrice);
+
+				cellPrice = new PdfPCell(
+						new Phrase("$ ".concat(numFormat.format(dataSales.getTotalPending())), fontData));
+				cellPrice.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cellPrice.setBorderWidth(1f);
+				table.addCell(cellPrice);
+
+				cellPrice = new PdfPCell(
+						new Phrase("$ ".concat(numFormat.format(dataSales.getTotalReserved())), fontData));
+				cellPrice.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cellPrice.setBorderWidth(1f);
+				table.addCell(cellPrice);
+			}
+
+			document.add(table);
+
+			document.add(Chunk.NEWLINE);
+
+			StringBuilder totalDataStr = new StringBuilder("Total Cobrado: $")
+					.append(numFormat.format(request.getTotal())).append(" // Gastos: -$")
+					.append(numFormat.format(request.getSpent())).append(" // Faltante: $")
+					.append(numFormat.format(request.getMissing()));
+
+			Paragraph totalsData = new Paragraph(totalDataStr.toString(), fontTitle);
+			totalsData.setAlignment(Element.ALIGN_LEFT);
+			document.add(totalsData);
 
 			document.close();
 
@@ -243,4 +301,11 @@ public class GenerateReceiptService implements GenerateReceiptInterface {
 		}
 	}
 
+	private Paragraph separatorLine() {
+		Paragraph separator = new Paragraph();
+		
+		separator.add(new Chunk(new LineSeparator(3f, 100f, null, Element.ALIGN_CENTER, 0)));
+		
+		return separator;
+	}
 }

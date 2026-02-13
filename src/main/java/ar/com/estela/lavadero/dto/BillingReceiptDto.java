@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class BillingReceiptDto extends SaleBillingResponse {
 
-	private Integer charge;
+	private Long charge;
 	
-	private Integer spent;
+	private Long spent;
 	
-	private Integer total;
+	private Long total;
 	
-	private Integer missing;
+	private Long missing;
 }
